@@ -2,3 +2,5 @@ ollama
 chromadb
 feedparser
 fastapi
+openai
+streamlit

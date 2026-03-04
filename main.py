@@ -1,68 +1,34 @@
-import feedparser
-import chromadb
-from chromadb.utils import embedding_functions
-from chromadb.config import Settings
-import hashlib
+from fastapi import FastAPI
+from pydantic import BaseModel
+from recup_question import poser_question
+import ollama
 
-embedding_function = embedding_functions.DefaultEmbeddingFunction()
-client = chromadb.Client(
-    Settings(
-        persist_directory='./chroma_db',
-        is_persistent=True
-    )
-)
+app = FastAPI()
 
-collection = client.get_or_create_collection(name='actu_france_24', embedding_function=embedding_function)
+class Question(BaseModel):
+    question: str
 
-def chunk_article(texte, chunk_size=800, overlap=150):
-    chunk = []
-    debut = 0
-    while debut < len(texte):
-        fin = debut + chunk_size
-        chunk.append(texte[debut:fin])
-        debut += chunk_size - overlap
-    return chunk
+@app.post('/chatbot')
+def chatbot(request: Question):
+    question = request.question
+    contexte = poser_question(question, n_results=5)
 
-urls = {
-    'Europe': 'https://www.france24.com/fr/europe/rss',
-    'Monde': 'https://www.france24.com/fr/monde/rss',
-    'Afrique': 'https://www.france24.com/fr/afrique/rss',
-    'Moyen-Orient': 'https://www.france24.com/fr/moyen-orient/rss',
-    'France': 'https://www.france24.com/fr/france/rss',
-    'Asie-Pacifique': 'https://www.france24.com/fr/asie-pacifique/rss',
-    'Amériques': 'https://www.france24.com/fr/amériques/rss'}
+#sans contexte
+    prompt_sans_contexte = question
+    prompt_avec_contexte = f'''Voici des articles pertinents :\n{contexte}\n\nQuestion : {question}\nRéponds de manière claire, 
+        développée le plus possible en bloc de texte sans listes numérotées/puces et sans rediriger vers les liens :'''
+    reponse_sans_contexte = ollama.chat(
+        model='mistral',
+        messages=[
+            {'role': 'system', 'content': 'Tu es un assistant qui répond uniquement à l\'aide de tes connaissances.'},
+            {'role': 'user', 'content': prompt_sans_contexte},])
 
-textes = []
-metadatas = []
+    reponse_avec_contexte = ollama.chat(
+        model='mistral',
+        messages=[{'role': 'system', 'content': 'Tu es un assistant qui répond uniquement à partir du contexte fourni.'},
+                  {'role': 'user', 'content': prompt_avec_contexte}])
 
-for endroit, url in urls.items():
-    feed = feedparser.parse(url)
-
-    for article in feed.entries:
-        titre = article['title']
-        texte = titre + ' ' + article.get('summary', '')
-        titre_id = hashlib.md5(titre.encode()).hexdigest()
-        chunk = chunk_article(texte)
-
-        for i, chunk in enumerate(chunk):
-            chunk_id = hashlib.md5(chunk.encode()).hexdigest()
-
-            collection.add(
-            ids = [chunk_id],
-            metadatas = [{'endroit': endroit,
-                'titre': article.get('title'),
-                'chunk': i,
-                'résumé': article.get('summary', 'pas de résumé'),
-                'lien': article.get('link', 'pas de lien')}],
-            documents = [chunk])
-
-#VOIR CE QU'IL YA DANS MA CHROMADB MAGNIFIQUE
-resultats = collection.get(include=['documents', 'metadatas'])
-
-documents = resultats['documents']
-metadatas = resultats['metadatas']
-
-for doc, meta in zip(documents, metadatas):
-    print(f"Chunk : {doc}")
-    print(f"Métadonnées : {meta}")
-    print("---"*40)
+    return {
+        'reponse_sans_contexte': reponse_sans_contexte['message']['content'],
+        'reponse_avec_contexte': reponse_avec_contexte['message']['content'],
+        'contexte': contexte}

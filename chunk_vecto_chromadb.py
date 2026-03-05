@@ -1,3 +1,4 @@
+#chunk_vecto_chromadb.py
 import feedparser
 import chromadb
 from chromadb.utils import embedding_functions

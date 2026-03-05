@@ -1,5 +1,8 @@
+#interface.py
+
 import streamlit as st
 import requests
+import os
 
 st.title('chatbot qui répond aux questions politiques')
 
@@ -22,6 +25,7 @@ if st.button('envoyer message') and question:
     with col3:
         st.subheader("contexte récupéré")
         st.markdown(f'<p style="font-size:14px; line-height:1.4">{data.get("contexte", "")}</p>', unsafe_allow_html=True)
+
     # contexte = poser_question(question)
     # prompt = f'Voici des articles pertinents :\n{contexte}\n\nQuestion : {question}\nRéponds de manière claire, développée le plus possible en bloc de texte sans listes numérotées/puces et sans rediriger vers les liens :'
     # prompt2 = 'Qui est rachida dati ?'

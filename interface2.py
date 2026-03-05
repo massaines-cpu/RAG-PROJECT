@@ -78,7 +78,7 @@ llm = st.selectbox(
     ["ollama", "gpt5"],
     label_visibility="collapsed"
 )
-if st.button(":green[Envoyer Message]") and question:
+if st.button(":green[Envoyer message]") and question:
     with st.spinner("Transmission au télégraphiste..."):
         try:
             response = requests.post(

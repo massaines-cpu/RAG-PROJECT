@@ -26,7 +26,7 @@ def chatbot(request: Question):
 
 #sans contexte
     prompt_sans_contexte = question
-    prompt_avec_contexte = f'''Voici des articles pertinents :\n{contexte}\n\nQuestion : {question}\nRéponds en français de manière claire, 
+    prompt_avec_contexte = f'''Voici des articles pertinents :\n{contexte}\n\nQuestion : {question}\nRéponds en langue française de manière claire, 
         développée le plus possible en bloc de texte sans listes numérotées/puces et sans rediriger vers les liens. N'invente pas une réponse
          si elle n'est pas dans le contexte qu'on te donne:'''
 
@@ -49,12 +49,18 @@ def chatbot(request: Question):
     elif llm == 'gpt4':
         reponse_sans_contexte = gpt.chat.completions.create(
             model="gpt-5.1-chat",
-            messages=[{"role": "user", "content": prompt_sans_contexte}])
+            messages=[
+                {"role": "system", "content": "Tu dois répondre uniquement en français."},
+                {"role": "user", "content": prompt_sans_contexte}
+            ])
         reponse_sans_contexte = reponse_sans_contexte.choices[0].message.content
 
         reponse_avec_contexte = gpt.chat.completions.create(
             model="gpt-5.1-chat",
-            messages=[{"role": "user", "content": prompt_avec_contexte}])
+            messages=[
+                {"role": "system", "content": "Tu dois répondre uniquement avec le contexte qui t'est donné, en français."},
+                {"role": "user", "content": prompt_avec_contexte}
+            ])
         reponse_avec_contexte = reponse_avec_contexte.choices[0].message.content
 
 

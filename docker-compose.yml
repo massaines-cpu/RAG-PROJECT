@@ -9,6 +9,9 @@ services:
       - .env
     volumes:
       - ./chroma_db:/app/chroma_db
+    networks:
+      - rag-network
+
   front:
     build:
       context: .
@@ -19,6 +22,8 @@ services:
       - api
     environment:
       - API_URL=http://api:8000
+    networks:
+      - rag-network
 
   ollama:
     image: ollama/ollama
@@ -26,6 +31,12 @@ services:
       - "11434:11434"
     volumes:
       - ollama_data:/root/.ollama
+    networks:
+      - rag-network
+
+networks:
+  rag-network:
+    driver: bridge
 
 volumes:
   ollama_data:

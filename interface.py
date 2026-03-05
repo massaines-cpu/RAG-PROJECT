@@ -10,7 +10,7 @@ question = st.text_input('posez votre question')
 llm = st.selectbox('choisir llm', ['ollama', 'gpt4'])
 
 if st.button('envoyer message') and question:
-    response = requests.post('http://127.0.0.1:8000/chatbot', json={'question': question, 'llm':llm})
+    response = requests.post('http://api:8000/chatbot', json={'question': question, 'llm':llm})
     data = response.json()
 
     col1, col2, col3 = st.columns(3)

@@ -1,9 +1,0 @@
-fastapi
-uvicorn
-streamlit
-requests
-ollama
-openai
-python-dotenv
-chromadb
-feedparser

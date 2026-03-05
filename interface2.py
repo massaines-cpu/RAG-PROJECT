@@ -75,7 +75,7 @@ st.markdown("<p style='color: black;'>Choisir le type de LLM</p>", unsafe_allow_
 # 2. Le menu déroulant avec le label masqué
 llm = st.selectbox(
     "label_cache_llm",
-    ["ollama", "gpt4"],
+    ["ollama", "gpt5"],
     label_visibility="collapsed"
 )
 if st.button(":green[Envoyer Message]") and question:
@@ -116,7 +116,7 @@ if st.button(":green[Envoyer Message]") and question:
                 )
                 # The context can be long, so we make it scrollable
                 st.markdown(
-                    f'<div class="article-body" style="height: 400px; overflow-y: scroll; padding: 10px;">{data["contexte"]}</div>',
+                    f'<div class="article-body">{data["contexte"]}</div>',
                     unsafe_allow_html=True,
                 )
 

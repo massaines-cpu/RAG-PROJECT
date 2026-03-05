@@ -46,7 +46,7 @@ def chatbot(request: Question):
                 {'role': 'user', 'content': prompt_avec_contexte}])
         reponse_avec_contexte = reponse_avec_contexte['message']['content']
 
-    elif llm == 'gpt4':
+    elif llm == 'gpt5':
         reponse_sans_contexte = gpt.chat.completions.create(
             model="gpt-5.1-chat",
             messages=[

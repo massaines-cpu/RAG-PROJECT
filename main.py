@@ -68,14 +68,3 @@ def chatbot(request: Question):
         'reponse_sans_contexte': reponse_sans_contexte,
         'reponse_avec_contexte': reponse_avec_contexte,
         'contexte': contexte}
-
-    # reponse_sans_contexte = ollama.chat(
-    #     model='mistral',
-    #     messages=[
-    #         {'role': 'system', 'content': 'Tu es un assistant qui répond uniquement à l\'aide de tes connaissances.'},
-    #         {'role': 'user', 'content': prompt_sans_contexte},])
-    #
-    # reponse_avec_contexte = ollama.chat(
-    #     model='mistral',
-    #     messages=[{'role': 'system', 'content': 'Tu es un assistant qui répond uniquement à partir du contexte fourni.'},
-    #               {'role': 'user', 'content': prompt_avec_contexte}])
